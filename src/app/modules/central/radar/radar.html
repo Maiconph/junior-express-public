@@ -1,0 +1,75 @@
+<!-- RADAR EM TEMPO REAL - MOTOBOYS E PEDIDOS -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col lg:flex-row h-[640px]">
+  <!-- MAPA VISUAL INTERATIVO (RADAR DE CRICIÚMA) -->
+  <div class="relative flex-1 bg-slate-900 overflow-hidden flex flex-col">
+    <!-- Topbar do radar -->
+    <div class="absolute top-3 left-3 right-3 z-10 flex items-center justify-between pointer-events-none">
+      <div class="bg-slate-900/90 px-3.5 py-1.5 rounded-lg border border-slate-700 text-xs font-bold text-emerald-400 flex items-center gap-2 pointer-events-auto">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+        Radar Operacional Ativo • Criciúma e Região
+      </div>
+    </div>
+
+    <!-- Canvas / SVG do Mapa -->
+    <div class="relative flex-1 w-full h-full">
+      <!-- Grid de fundo -->
+      <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-70"></div>
+
+      <!-- Motoboys no Mapa -->
+      <div
+        *ngFor="let mb of motoboys"
+        (click)="selecionarMotoboy(mb)"
+        [style.left.%]="converterParaCoordenadasMapa(mb.coordenadasAtuais?.lat, mb.coordenadasAtuais?.lng).x"
+        [style.top.%]="converterParaCoordenadasMapa(mb.coordenadasAtuais?.lat, mb.coordenadasAtuais?.lng).y"
+        class="absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer group"
+      >
+        <div
+          [class.bg-red-600]="mb.status === 'socorro_solicitado'"
+          [class.bg-blue-600]="mb.status === 'em_rota'"
+          [class.bg-emerald-600]="mb.status === 'disponivel'"
+          class="w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-xs font-black transition-transform group-hover:scale-125"
+        >
+          🏍️
+        </div>
+        <div class="absolute top-9 left-1/2 -translate-x-1/2 bg-slate-950/90 text-white text-[10px] px-2 py-0.5 rounded-md font-bold whitespace-nowrap shadow-md">
+          {{ mb.nome.split(' ')[0] }} ({{ mb.pedidosNoBauIds.length }})
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LATERAL: LISTA DE MOTOBOYS E DETALHES -->
+  <div class="w-full lg:w-80 bg-slate-50 border-l border-slate-200 p-4 space-y-4 overflow-y-auto">
+    <h3 class="text-xs font-bold text-slate-800 uppercase">Frota de Motoboys</h3>
+
+    <div class="space-y-2">
+      <div
+        *ngFor="let mb of motoboys"
+        (click)="selecionarMotoboy(mb)"
+        [class.border-blue-700]="motoboySelecionado?.id === mb.id"
+        [class.bg-white]="motoboySelecionado?.id === mb.id"
+        class="p-3 rounded-xl border border-slate-200 cursor-pointer transition-all hover:bg-white"
+      >
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-bold text-slate-900">{{ mb.nome }}</p>
+          <span
+            [class.bg-red-100]="mb.status === 'socorro_solicitado'"
+            [class.text-red-900]="mb.status === 'socorro_solicitado'"
+            [class.bg-blue-100]="mb.status === 'em_rota'"
+            [class.text-blue-900]="mb.status === 'em_rota'"
+            [class.bg-emerald-100]="mb.status === 'disponivel'"
+            [class.text-emerald-900]="mb.status === 'disponivel'"
+            class="px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase"
+          >
+            {{ mb.status }}
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">{{ mb.modeloMoto }} • Placa {{ mb.placaMoto }}</p>
+        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+          <span>No baú: <strong>{{ mb.pedidosNoBauIds.length }}</strong></span>
+          <span>Hoje: <strong>{{ mb.entregasConcluidasHoje }}</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

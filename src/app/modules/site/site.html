@@ -1,0 +1,42 @@
+<!-- SITE INSTITUCIONAL JUNIOR EXPRESS -->
+<div class="space-y-8 max-w-4xl mx-auto">
+  <!-- HERO -->
+  <div class="bg-blue-950 text-white rounded-2xl p-8 text-center space-y-4 shadow-lg">
+    <span class="text-xs font-bold uppercase tracking-widest text-red-500">Junior Express Criciúma</span>
+    <h1 class="text-3xl font-black uppercase">Entregas Rápidas e Urgentes com Motoboy</h1>
+    <p class="text-slate-300 text-sm max-w-xl mx-auto">
+      Atendemos empresas, comércios, cartórios e escritórios em toda a região de Criciúma, Içara e cidades vizinhas.
+    </p>
+    <div class="pt-2 flex justify-center gap-3">
+      <a href="https://wa.me/5548991018000" target="_blank" class="px-5 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase rounded-xl shadow-md">
+        Solicitar Motoboy pelo WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <!-- CALCULADORA RÁPIDA -->
+  <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+    <h2 class="text-base font-bold text-slate-900 uppercase">Simular Valor de Entrega</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Cidade de Destino</label>
+        <select [(ngModel)]="cidade" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+          <option value="Criciúma">Criciúma</option>
+          <option value="Içara">Içara</option>
+          <option value="Forquilhinha">Forquilhinha</option>
+          <option value="Cocal do Sul">Cocal do Sul</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Bairro</label>
+        <input type="text" [(ngModel)]="bairro" placeholder="Ex: Próspera, Centro, Michel..." class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" />
+      </div>
+    </div>
+
+    <div *ngIf="resultadoValor" class="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between">
+      <span class="text-xs font-bold text-slate-700">Taxa Estimada de Corrida:</span>
+      <span class="text-lg font-black text-blue-900">R$ {{ resultadoValor.toFixed(2) }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="max-w-md mx-auto space-y-4 pb-12">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-md p-6 text-center space-y-4">
+    <div class="inline-flex px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-bold uppercase">
+      Validação Segura de Entrega
+    </div>
+
+    <div>
+      <h2 class="text-base font-bold text-slate-900">Apresente este QR Code ao Motoboy</h2>
+      <p class="text-xs text-slate-500 mt-1">
+        Mostre esta tela quando o entregador da Junior Express chegar no endereço.
+      </p>
+    </div>
+
+    <!-- ÁREA QR CODE -->
+    <div class="p-8 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl space-y-2">
+      <p class="text-xs font-mono font-bold text-blue-900">{{ order.entrega.qrCodeToken }}</p>
+      <p class="text-[11px] text-slate-400">Escaneamento Instantâneo sem cliques</p>
+    </div>
+
+    <div class="bg-slate-100 p-3 rounded-xl">
+      <p class="text-[10px] uppercase font-bold text-slate-500">PIN Reserva de 4 Dígitos:</p>
+      <p class="text-2xl font-mono font-black tracking-widest text-slate-900">{{ order.entrega.pinReserva }}</p>
+    </div>
+
+    <div class="text-xs text-slate-500 pt-2 border-t border-slate-100">
+      <p>Entregador a caminho: <strong class="text-slate-800">{{ order.motoboyNome }}</strong></p>
+      <p>Destino: {{ order.entrega.bairro }} (Criciúma)</p>
+    </div>
+  </div>
+</div>

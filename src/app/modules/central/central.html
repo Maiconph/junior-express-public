@@ -1,0 +1,130 @@
+<!-- CENTRAL OPERACIONAL JUNIOR EXPRESS -->
+<div class="space-y-6">
+  <!-- TOPBAR DA CENTRAL -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-red-600"></span>
+        <h1 class="text-lg font-black text-blue-950 uppercase tracking-tight">
+          Central Operacional Junior Express
+        </h1>
+      </div>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Mina Brasil • Criciúma - SC • Fone: (48) 3045-4829
+      </p>
+    </div>
+
+    <!-- ABAS DE NAVEGAÇÃO -->
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        (click)="definirAba('radar')"
+        [class.bg-blue-900]="abaAtiva === 'radar'"
+        [class.text-white]="abaAtiva === 'radar'"
+        [class.bg-slate-100]="abaAtiva !== 'radar'"
+        class="px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+      >
+        Radar ao Vivo
+      </button>
+
+      <button
+        (click)="definirAba('novo-pedido')"
+        [class.bg-blue-900]="abaAtiva === 'novo-pedido'"
+        [class.text-white]="abaAtiva === 'novo-pedido'"
+        [class.bg-slate-100]="abaAtiva !== 'novo-pedido'"
+        class="px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+      >
+        Nova Ordem de Serviço
+      </button>
+
+      <button
+        (click)="definirAba('quadro')"
+        [class.bg-blue-900]="abaAtiva === 'quadro'"
+        [class.text-white]="abaAtiva === 'quadro'"
+        [class.bg-slate-100]="abaAtiva !== 'quadro'"
+        class="px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+      >
+        Quadro de Pedidos ({{ pedidos.length }})
+      </button>
+
+      <button
+        (click)="definirAba('clientes')"
+        [class.bg-blue-900]="abaAtiva === 'clientes'"
+        [class.text-white]="abaAtiva === 'clientes'"
+        [class.bg-slate-100]="abaAtiva !== 'clientes'"
+        class="px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+      >
+        Clientes
+      </button>
+
+      <button
+        (click)="definirAba('colaboradores')"
+        [class.bg-blue-900]="abaAtiva === 'colaboradores'"
+        [class.text-white]="abaAtiva === 'colaboradores'"
+        [class.bg-slate-100]="abaAtiva !== 'colaboradores'"
+        class="px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+      >
+        Colaboradores
+      </button>
+
+      <button
+        (click)="definirAba('faturamento')"
+        [class.bg-blue-900]="abaAtiva === 'faturamento'"
+        [class.text-white]="abaAtiva === 'faturamento'"
+        [class.bg-slate-100]="abaAtiva !== 'faturamento'"
+        class="px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+      >
+        Faturamento e Caixa
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTEÚDO ATIVO CONFORME ABA -->
+  <div [ngSwitch]="abaAtiva">
+    <app-radar
+      *ngSwitchCase="'radar'"
+      [motoboys]="motoboys"
+      [pedidos]="pedidos"
+      (pedirTransbordo)="abrirTransbordo($event)"
+    ></app-radar>
+
+    <app-novo-pedido
+      *ngSwitchCase="'novo-pedido'"
+      [clientePreSelecionado]="clienteSelecionadoParaDespacho"
+      (pedidoCriado)="aoCriarPedido($event)"
+    ></app-novo-pedido>
+
+    <app-quadro-pedidos
+      *ngSwitchCase="'quadro'"
+      [pedidos]="pedidos"
+      (imprimir)="pedidoImpressao = $event"
+      (pedirTransbordo)="abrirTransbordo($event)"
+    ></app-quadro-pedidos>
+
+    <app-clientes
+      *ngSwitchCase="'clientes'"
+      (novoPedido)="iniciarPedidoParaCliente($event)"
+    ></app-clientes>
+
+    <app-colaboradores
+      *ngSwitchCase="'colaboradores'"
+    ></app-colaboradores>
+
+    <app-faturamento
+      *ngSwitchCase="'faturamento'"
+      [pedidos]="pedidos"
+      [motoboys]="motoboys"
+    ></app-faturamento>
+  </div>
+
+  <!-- MODAL DE IMPRESSÃO A4 -->
+  <app-guia-impressao *ngIf="pedidoImpressao" [pedido]="pedidoImpressao" (fechar)="pedidoImpressao = null"></app-guia-impressao>
+
+  <!-- MODAL DE TRANSBORDO -->
+  <app-transbordo
+    *ngIf="transbordoAtivo"
+    [requisicao]="transbordoAtivo"
+    (aprovarTransbordo)="aprovarTransbordo($event)"
+    (rejeitarTransbordo)="rejeitarTransbordo($event)"
+    (fechar)="transbordoAtivo = null"
+  ></app-transbordo>
+</div>

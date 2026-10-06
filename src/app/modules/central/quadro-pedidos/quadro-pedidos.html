@@ -1,0 +1,81 @@
+<!-- QUADRO KANBAN DE PEDIDOS -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+  <!-- COLUNA: PENDENTES (AGUARDANDO MOTOBOY BIPAR GUIA A4) -->
+  <div class="bg-slate-100 rounded-xl p-3.5 space-y-3 border border-slate-200">
+    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+      <h3 class="text-xs font-bold text-slate-800 uppercase">1. Pendente Guia</h3>
+      <span class="px-2 py-0.5 bg-slate-200 text-slate-800 rounded-full text-[11px] font-bold">{{ pendentes.length }}</span>
+    </div>
+
+    <div *ngFor="let pedido of pendentes" class="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs space-y-2">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-mono font-bold text-blue-900">{{ pedido.id }}</span>
+        <span class="font-bold text-slate-700">R$ {{ pedido.valorTotal.toFixed(2) }}</span>
+      </div>
+      <p class="text-xs font-bold text-slate-900">{{ pedido.clienteNome }}</p>
+      <p class="text-[11px] text-slate-600 truncate">Destino: {{ pedido.entrega.destinatario }} ({{ pedido.entrega.bairro }})</p>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-end">
+        <button (click)="imprimirGuia(pedido)" class="px-2.5 py-1 bg-blue-900 text-white rounded-md text-[11px] font-bold uppercase cursor-pointer">
+          Imprimir Guia A4
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLUNA: ATRIBUÍDOS E COLETADOS -->
+  <div class="bg-blue-50/60 rounded-xl p-3.5 space-y-3 border border-blue-200">
+    <div class="flex items-center justify-between pb-2 border-b border-blue-200">
+      <h3 class="text-xs font-bold text-blue-950 uppercase">2. No Baú / Coleta</h3>
+      <span class="px-2 py-0.5 bg-blue-200 text-blue-950 rounded-full text-[11px] font-bold">{{ atribuidos.length }}</span>
+    </div>
+
+    <div *ngFor="let pedido of atribuidos" class="bg-white p-3.5 rounded-lg border border-blue-200 shadow-2xs space-y-2">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-mono font-bold text-blue-900">{{ pedido.id }}</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-blue-100 text-blue-900">{{ pedido.status }}</span>
+      </div>
+      <p class="text-xs font-bold text-slate-900">{{ pedido.clienteNome }}</p>
+      <p class="text-[11px] text-slate-600">Motoboy: {{ pedido.motoboyNome }}</p>
+    </div>
+  </div>
+
+  <!-- COLUNA: EM ROTA DE ENTREGA -->
+  <div class="bg-sky-50/60 rounded-xl p-3.5 space-y-3 border border-sky-200">
+    <div class="flex items-center justify-between pb-2 border-b border-sky-200">
+      <h3 class="text-xs font-bold text-sky-950 uppercase">3. Em Rota</h3>
+      <span class="px-2 py-0.5 bg-sky-200 text-sky-950 rounded-full text-[11px] font-bold">{{ emRota.length }}</span>
+    </div>
+
+    <div *ngFor="let pedido of emRota" class="bg-white p-3.5 rounded-lg border border-sky-200 shadow-2xs space-y-2">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-mono font-bold text-sky-900">{{ pedido.id }}</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-sky-100 text-sky-900">Em Rota</span>
+      </div>
+      <p class="text-xs font-bold text-slate-900">{{ pedido.entrega.destinatario }}</p>
+      <p class="text-[11px] text-slate-600">{{ pedido.entrega.endereco }}, {{ pedido.entrega.bairro }}</p>
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+        <span class="text-slate-500">{{ pedido.motoboyNome }}</span>
+        <button (click)="solicitarTransbordo(pedido.id)" class="text-red-600 font-bold hover:underline cursor-pointer">
+          Socorro / Transbordo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLUNA: FINALIZADOS / ENTREGUES -->
+  <div class="bg-emerald-50/60 rounded-xl p-3.5 space-y-3 border border-emerald-200">
+    <div class="flex items-center justify-between pb-2 border-b border-emerald-200">
+      <h3 class="text-xs font-bold text-emerald-950 uppercase">4. Entregues Hoje</h3>
+      <span class="px-2 py-0.5 bg-emerald-200 text-emerald-950 rounded-full text-[11px] font-bold">{{ entregues.length }}</span>
+    </div>
+
+    <div *ngFor="let pedido of entregues" class="bg-white p-3.5 rounded-lg border border-emerald-200 shadow-2xs space-y-2">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-mono font-bold text-emerald-900">{{ pedido.id }}</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-emerald-100 text-emerald-900">Entregue</span>
+      </div>
+      <p class="text-xs font-bold text-slate-900">{{ pedido.entrega.destinatario }}</p>
+      <p class="text-[11px] text-slate-500">Recebido por: {{ pedido.entrega.recebidoPorNome || 'Confirmado via QR' }}</p>
+    </div>
+  </div>
+</div>

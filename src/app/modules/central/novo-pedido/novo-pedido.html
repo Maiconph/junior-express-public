@@ -1,0 +1,353 @@
+<!-- NOVA ORDEM DE SERVIÇO (JUNIOR EXPRESS) -->
+<form (ngSubmit)="emitirOrdemServico()" class="bg-white rounded-xl border border-slate-200 shadow-xs p-6 md:p-8 space-y-8">
+  <!-- CABEÇALHO DO FORMULÁRIO -->
+  <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-5 gap-4">
+    <div>
+      <h2 class="text-lg font-black text-blue-950 uppercase tracking-tight">
+        NOVA ORDEM DE SERVIÇO
+      </h2>
+      <p class="text-xs text-slate-500 mt-1">
+        Digite o nome da empresa para busca automática instantânea ou cadastre novos clientes conveniados.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="modalCadastroRapidoAberto = true"
+      class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold uppercase tracking-wider cursor-pointer"
+    >
+      + Cadastrar Nova Empresa
+    </button>
+  </div>
+
+  <!-- BLOCO SUPERIOR: IDENTIFICAÇÃO DA EMPRESA COM BUSCA AUTOMÁTICA -->
+  <div class="bg-slate-50/80 border border-slate-200 rounded-2xl p-5 md:p-6 relative">
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-xs font-black text-blue-950 uppercase tracking-wider">
+        1. Identificação da Empresa Contratante (Busca Automática)
+      </span>
+
+      <div *ngIf="clienteSelecionado" class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-bold rounded-lg uppercase tracking-wide">
+          Empresa Vinculada: {{ clienteSelecionado.tipoFaturamento.toUpperCase() }}
+        </span>
+        <button
+          type="button"
+          (click)="limparClienteSelecionado()"
+          class="p-1 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
+          title="Desvincular e buscar outro"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <!-- Busca de Cliente com Autocomplete -->
+      <div class="md:col-span-6 relative">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Nome da Empresa / Cliente Solicitante *
+        </label>
+        <input
+          type="text"
+          required
+          [(ngModel)]="clienteNome"
+          name="clienteNome"
+          (input)="aoDigitarClienteInput($event)"
+          placeholder="Comece a digitar o nome da empresa ou CNPJ..."
+          class="w-full px-3 py-2.5 text-xs bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-hidden font-semibold text-slate-900 shadow-2xs"
+        />
+
+        <!-- Dropdown de sugestões -->
+        <div *ngIf="abrirSugestoes && clientesFiltrados.length > 0" class="absolute left-0 right-0 top-full mt-1.5 z-30 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-64 overflow-y-auto">
+          <div class="px-3 py-2 bg-slate-100 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase">
+            Empresas Cadastradas Encontradas (Clique para preencher)
+          </div>
+          <div
+            *ngFor="let cliente of clientesFiltrados"
+            (click)="selecionarCliente(cliente)"
+            class="p-3 hover:bg-blue-50/80 cursor-pointer border-b border-slate-100 last:border-b-0"
+          >
+            <div class="flex items-center justify-between">
+              <p class="text-xs font-bold text-slate-900">{{ cliente.nome }}</p>
+              <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-sm bg-blue-100 text-blue-900">
+                {{ cliente.tipoFaturamento }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+              <span>CNPJ: {{ cliente.cnpjCpf }}</span>
+              <span>{{ cliente.endereco }}, {{ cliente.bairro }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CNPJ ou CPF -->
+      <div class="md:col-span-3">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          CNPJ ou CPF do Cliente
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="clienteCnpjCpf"
+          name="clienteCnpjCpf"
+          placeholder="00.000.000/0001-00"
+          class="w-full px-3 py-2.5 text-xs bg-white border border-slate-300 rounded-xl font-mono text-slate-900 shadow-2xs"
+        />
+      </div>
+
+      <!-- Telefone / WhatsApp -->
+      <div class="md:col-span-3">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Telefone / WhatsApp do Cliente
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="clienteTelefone"
+          name="clienteTelefone"
+          placeholder="(48) 99999-0000"
+          class="w-full px-3 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 shadow-2xs font-medium"
+        />
+      </div>
+
+      <!-- Endereço Cadastral da Empresa -->
+      <div class="md:col-span-6">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Endereço da Empresa / Cliente
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="clienteEndereco"
+          name="clienteEndereco"
+          placeholder="Ex: Av. Centenário, 1850, Pinheirinho, Criciúma"
+          class="w-full px-3 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 shadow-2xs font-medium"
+        />
+      </div>
+
+      <!-- Descrição da Carga -->
+      <div class="md:col-span-6">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Descrição do Pacote / Carga *
+        </label>
+        <input
+          type="text"
+          required
+          [(ngModel)]="descricaoCarga"
+          name="descricaoCarga"
+          placeholder="Ex: Pastilhas de freio 3kg, pasta com certidões, remédio manipulado..."
+          class="w-full px-3 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 shadow-2xs font-medium"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO CENTRAL: COLETA E DESTINO EM 2 COLUNAS -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- COLUNA DA ESQUERDA: COLETA -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-2xs">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <span class="text-xs font-black text-blue-950 uppercase tracking-wider">
+          2. Ponto de Coleta (Origem)
+        </span>
+        <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+          <button
+            type="button"
+            (click)="alterarTipoOrigem('cliente')"
+            [class.bg-blue-900]="origemTipo === 'cliente'"
+            [class.text-white]="origemTipo === 'cliente'"
+            class="px-2 py-1 text-[11px] font-bold rounded-md cursor-pointer"
+          >
+            Na Empresa
+          </button>
+          <button
+            type="button"
+            (click)="alterarTipoOrigem('base')"
+            [class.bg-blue-900]="origemTipo === 'base'"
+            [class.text-white]="origemTipo === 'base'"
+            class="px-2 py-1 text-[11px] font-bold rounded-md cursor-pointer"
+          >
+            Base Junior Express
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Local / Empresa de Coleta
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="coletaEmpresa"
+          name="coletaEmpresa"
+          class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-medium text-slate-900"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Endereço de Coleta (Rua, Número)
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="coletaEndereco"
+          name="coletaEndereco"
+          class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-medium text-slate-900"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Bairro de Coleta
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="coletaBairro"
+            name="coletaBairro"
+            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-900"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Cidade de Coleta
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="coletaCidade"
+            name="coletaCidade"
+            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-900"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUNA DA DIREITA: ENTREGA (DESTINO) -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-2xs">
+      <div class="pb-2 border-b border-slate-100">
+        <span class="text-xs font-black text-blue-950 uppercase tracking-wider">
+          3. Ponto de Entrega (Destino Final)
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Destinatário (Quem recebe) *
+          </label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="destinatario"
+            name="destinatario"
+            placeholder="Nome da pessoa ou empresa"
+            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-medium text-slate-900"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Telefone do Destinatário
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="entregaTelefone"
+            name="entregaTelefone"
+            placeholder="(48) 99999-0000"
+            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-900"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Endereço de Entrega (Rua, Número) *
+        </label>
+        <input
+          type="text"
+          required
+          [(ngModel)]="entregaEndereco"
+          name="entregaEndereco"
+          placeholder="Rua, número e complemento do destino"
+          class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-medium text-slate-900"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Bairro de Destino *
+          </label>
+          <select
+            [(ngModel)]="entregaBairro"
+            name="entregaBairro"
+            (change)="alterarBairroEntregaSelect($event)"
+            class="w-full px-2.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-900 font-medium"
+          >
+            <optgroup *ngFor="let zona of tabelaRegioes" [label]="zona.cidade + ' (R$ ' + zona.valorBase.toFixed(2) + ')'">
+              <option *ngFor="let b of zona.bairros" [value]="b">{{ b }} ({{ zona.cidade }})</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Ponto de Referência
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="entregaReferencia"
+            name="entregaReferencia"
+            placeholder="Ex: Próx. ao Nações Shopping"
+            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-900"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO INFERIOR: FATURAMENTO E BOTÃO DE EMISSÃO -->
+  <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+      <div class="md:col-span-5">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Forma de Cobrança / Faturamento
+        </label>
+        <select
+          [(ngModel)]="formaPagamento"
+          name="formaPagamento"
+          class="w-full px-3 py-2.5 text-xs bg-white border border-slate-300 rounded-xl font-bold text-slate-900 shadow-2xs"
+        >
+          <option value="mensalista_faturado">Faturado Mensalista (Fechamento no fim do mês)</option>
+          <option value="quinzenal_faturado">Faturado Quinzenal (Fechamento a cada 15 dias)</option>
+          <option value="semanal_faturado">Faturado Semanal (Fechamento toda sexta-feira)</option>
+          <option value="dinheiro_destino">Cobrar em Dinheiro no Destino</option>
+          <option value="pix_destino">Cobrar via PIX no Destino</option>
+          <option value="cartao_maquininha">Cobrar com Cartão no Destino</option>
+        </select>
+      </div>
+
+      <div class="md:col-span-3">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          Valor da Corrida (R$)
+        </label>
+        <input
+          type="number"
+          step="0.5"
+          [(ngModel)]="valorCustomizado"
+          name="valorCustomizado"
+          class="w-full px-3 py-2.5 text-sm font-black text-slate-900 bg-white border border-slate-300 rounded-xl shadow-2xs"
+        />
+        <p class="text-[11px] text-slate-500 mt-1">
+          Tabela regional: {{ entregaCidade }} ({{ entregaBairro }})
+        </p>
+      </div>
+
+      <div class="md:col-span-4 flex items-end">
+        <button
+          type="submit"
+          class="w-full py-3.5 px-6 bg-blue-900 hover:bg-blue-950 text-white rounded-xl shadow-md text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+        >
+          <span>Emitir O.S. e Abrir Guia A4</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

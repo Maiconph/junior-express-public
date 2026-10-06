@@ -1,0 +1,167 @@
+<!-- CADASTRO E GESTÃO DE CLIENTES / EMPRESAS -->
+<div class="space-y-6">
+  <!-- CABEÇALHO -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 class="text-base font-bold text-slate-900 uppercase tracking-tight">
+        Cadastro e Gestão de Empresas e Clientes
+      </h2>
+      <p class="text-xs text-slate-500 mt-0.5">
+        Cadastre empresas parceiras definindo condições de faturamento (mensal, quinzenal, semanal) para preenchimento instantâneo em ordens de serviço.
+      </p>
+    </div>
+
+    <button
+      (click)="abrirModalNovo()"
+      class="px-4 py-2.5 bg-blue-900 hover:bg-blue-950 text-white rounded-lg text-xs font-bold uppercase tracking-wider shadow-xs transition-all cursor-pointer"
+    >
+      + Cadastrar Empresa / Cliente
+    </button>
+  </div>
+
+  <!-- INDICADORES RÁPIDOS -->
+  <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+    <div (click)="filtroFaturamento = 'todos'" [class.bg-blue-950]="filtroFaturamento === 'todos'" [class.text-white]="filtroFaturamento === 'todos'" class="p-3.5 rounded-xl border border-slate-200 cursor-pointer bg-white">
+      <p class="text-[11px] font-bold uppercase">Total Geral</p>
+      <p class="text-xl font-black mt-0.5">{{ estatisticas.total }}</p>
+    </div>
+
+    <div (click)="filtroFaturamento = 'mensalista'" [class.bg-blue-900]="filtroFaturamento === 'mensalista'" [class.text-white]="filtroFaturamento === 'mensalista'" class="p-3.5 rounded-xl border border-slate-200 cursor-pointer bg-white">
+      <p class="text-[11px] font-bold uppercase">Mensalistas</p>
+      <p class="text-xl font-black mt-0.5">{{ estatisticas.mensalistas }}</p>
+    </div>
+
+    <div (click)="filtroFaturamento = 'quinzenal'" [class.bg-sky-900]="filtroFaturamento === 'quinzenal'" [class.text-white]="filtroFaturamento === 'quinzenal'" class="p-3.5 rounded-xl border border-slate-200 cursor-pointer bg-white">
+      <p class="text-[11px] font-bold uppercase">Quinzenais</p>
+      <p class="text-xl font-black mt-0.5">{{ estatisticas.quinzenais }}</p>
+    </div>
+
+    <div (click)="filtroFaturamento = 'semanal'" [class.bg-indigo-900]="filtroFaturamento === 'semanal'" [class.text-white]="filtroFaturamento === 'semanal'" class="p-3.5 rounded-xl border border-slate-200 cursor-pointer bg-white">
+      <p class="text-[11px] font-bold uppercase">Semanais</p>
+      <p class="text-xl font-black mt-0.5">{{ estatisticas.semanais }}</p>
+    </div>
+
+    <div (click)="filtroFaturamento = 'avulso'" [class.bg-amber-900]="filtroFaturamento === 'avulso'" [class.text-white]="filtroFaturamento === 'avulso'" class="p-3.5 rounded-xl border border-slate-200 cursor-pointer bg-white">
+      <p class="text-[11px] font-bold uppercase">Por Corrida</p>
+      <p class="text-xl font-black mt-0.5">{{ estatisticas.avulsos }}</p>
+    </div>
+  </div>
+
+  <!-- BUSCA -->
+  <div class="bg-white rounded-xl border border-slate-200 p-3 flex items-center gap-3">
+    <input
+      type="text"
+      [(ngModel)]="termoBusca"
+      placeholder="Buscar por nome da empresa, CNPJ, CPF, bairro, endereço ou telefone..."
+      class="w-full text-xs text-slate-800 bg-transparent focus:outline-hidden"
+    />
+  </div>
+
+  <!-- LISTAGEM -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div *ngFor="let cliente of clientesFiltrados" class="bg-white rounded-xl border border-slate-200 shadow-2xs p-5 flex flex-col justify-between">
+      <div>
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-black text-slate-900">{{ cliente.nome }}</h3>
+            <p class="text-xs font-mono font-medium text-slate-500 mt-0.5">
+              CNPJ/CPF: {{ cliente.cnpjCpf }}
+            </p>
+          </div>
+          <span class="px-2.5 py-1 rounded-md text-[11px] font-bold uppercase bg-blue-100 text-blue-900">
+            {{ cliente.tipoFaturamento }}
+          </span>
+        </div>
+
+        <div class="mt-3.5 space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-3">
+          <p class="font-semibold text-slate-800">{{ cliente.endereco }} - {{ cliente.bairro }}, {{ cliente.cidade }}</p>
+          <p class="text-slate-500">Fone: {{ cliente.telefone }} <span *ngIf="cliente.responsavel">({{ cliente.responsavel }})</span></p>
+          <p *ngIf="cliente.observacoes" class="text-[11px] text-slate-600 bg-slate-50 p-2 rounded-lg">
+            Obs: {{ cliente.observacoes }}
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-1.5">
+          <button (click)="abrirModalEditar(cliente)" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold cursor-pointer">
+            Editar
+          </button>
+          <button (click)="excluirCliente(cliente.id, cliente.nome)" class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold cursor-pointer">
+            Excluir
+          </button>
+        </div>
+
+        <button (click)="iniciarPedido(cliente)" class="px-3.5 py-2 bg-blue-900 hover:bg-blue-950 text-white rounded-lg text-xs font-bold uppercase tracking-wider cursor-pointer">
+          Novo Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div *ngIf="modalAberto" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-2xl w-full p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h3 class="text-sm font-bold text-slate-900 uppercase">
+          {{ clienteEdicao ? 'Editar Empresa' : 'Cadastrar Nova Empresa' }}
+        </h3>
+        <button (click)="modalAberto = false" class="p-1 rounded-md text-slate-400 hover:text-slate-700">✕</button>
+      </div>
+
+      <form (ngSubmit)="salvarCliente()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nome da Empresa *</label>
+            <input type="text" required [(ngModel)]="nome" name="nome" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">CNPJ ou CPF *</label>
+            <input type="text" required [(ngModel)]="cnpjCpf" name="cnpjCpf" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-mono" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tipo de Faturamento *</label>
+            <select [(ngModel)]="tipoFaturamento" name="tipoFaturamento" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg font-bold">
+              <option value="mensalista">Mensalista</option>
+              <option value="quinzenal">Quinzenal</option>
+              <option value="semanal">Semanal</option>
+              <option value="avulso">Por Corrida</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Telefone / WhatsApp *</label>
+            <input type="text" required [(ngModel)]="telefone" name="telefone" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Responsável / Contato</label>
+            <input type="text" [(ngModel)]="responsavel" name="responsavel" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Endereço da Empresa *</label>
+            <input type="text" required [(ngModel)]="endereco" name="endereco" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Bairro</label>
+            <input type="text" [(ngModel)]="bairro" name="bairro" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Cidade</label>
+            <input type="text" [(ngModel)]="cidade" name="cidade" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" />
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+          <button type="button" (click)="modalAberto = false" class="px-4 py-2 bg-slate-100 rounded-lg text-xs font-bold uppercase">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-blue-900 text-white rounded-lg text-xs font-bold uppercase">Salvar Empresa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
